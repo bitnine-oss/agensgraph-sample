@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    driver-class-name: "net.bitnine.agensgraph.Driver"
+    username: "postgres"
+    password: "postgres"
+    url: "jdbc:agensgraph://localhost:15432/postgres"
+    graphpath: test_graph

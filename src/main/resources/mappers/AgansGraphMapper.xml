@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bitnine.agensgraphapi.api.mapper.AgensGraphMapper">
+
+    <update id="setGraphPath">
+        set graph_path = a;
+    </update>
+    <select id="createVertex" parameterType="hashMap" resultType="String">
+
+        create (v:${vLabel}
+        <![CDATA[{]]>
+            ${properties}
+        <![CDATA[})]]>
+        return id(v);
+    </select>
+
+    <select id="readVertexId" parameterType="hashMap" resultType="String">
+        match (a)
+        where id(a) = ${graphId}::graphid
+        return properties(a);
+    </select>
+
+    <select id="readVertex" parameterType="hashMap" resultType="hashMap">
+        match (a)
+        where id(a) = ${graphid}::graphid
+        return properties(a);
+    </select>
+
+    <select id="updateVertex" parameterType="hashMap" resultType="String">
+        match(v)
+        where id(v) = ${vertexid}
+        set v =
+        <![CDATA[{]]>
+            ${properties}
+        <![CDATA[}]]>
+        return id(v);
+    </select>
+
+    <select id="deleteVertex" parameterType="hashMap" resultType="Integer">
+        match (a)
+        where id(a) = ${vertexid}::graphid
+        detach delete (a)
+        return distinct 0;
+    </select>
+
+    <select id="createEdge" parameterType="hashMap" resultType="String">
+        match (a),(b)
+        where id(a) = ${sourceid}
+        and id(b) = ${targetid}
+        create (a)-[c:${elabel}
+        <![CDATA[{]]>
+            ${properties}
+        <![CDATA[
+            }]->(b)
+        ]]>
+        return id(c);
+    </select>
+
+    <select id="readEdgeId" parameterType="hashMap" resultType="String">
+        match (b)-[a]-(c)
+        where id(a) = ${graphId}::graphid
+        return properties(a);
+    </select>
+
+    <select id="updateEdge" parameterType="hashMap" resultType="String">
+        match ()-[n]-()
+        where id(n)= ${edgeid}
+        set n =
+        <![CDATA[{]]>
+            ${properties}
+        <![CDATA[}]]>
+        return distinct id(n);
+    </select>
+
+    <select id="deleteEdge" parameterType="hashMap" resultType="Integer">
+        match ()-[a]-()
+        where id(a) = ${edgeid}::graphid
+        detach delete a
+        return distinct 0;
+    </select>
+
+    <select id="readVertexAll" resultType="hashMap">
+        match (a)
+        return label(a) as label
+            ,id(a) as id
+            ,properties(a) as properties
+    </select>
+
+    <select id="readEdgeAll" resultType="hashMap">
+        match (a)-[b]->(c)
+        return label(b) as edgelabel
+            ,id(b) as edgeid
+            ,id(a) as start
+            ,id(c) as end
+            ,properties(b) as properties;
+
+    </select>
+
+    <select id="readGraphId" parameterType="hashMap" resultType="String">
+        match (a)
+        where id(a) = ${graphid}::graphid
+        return properties(a);
+    </select>
+
+    <select id="readVertexLabel" parameterType="hashMap" resultType="String">
+        match (a)
+        where id(a) = #{graphId}::graphid
+        return label(a) as label
+
+    </select>
+</mapper>
